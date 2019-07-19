@@ -1,0 +1,73 @@
+!SESSION 2019-07-19 17:48:41.665 -----------------------------------------------
+eclipse.buildId=4.12.0.I20190605-1800
+java.version=11.0.3
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.cpp.product
+Command-line arguments:  -data /home/greendot/work/playOpenssl2 -os linux -ws gtk -arch x86_64 -product org.eclipse.epp.package.cpp.product
+
+!ENTRY org.eclipse.egit.core 1 0 2019-07-19 17:49:08.152
+!MESSAGE Using Apache MINA sshd as ssh client.
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-07-19 17:49:45.323
+!MESSAGE Enablement expression is missing for descriptor type org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2019-07-19 17:49:45.327
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:52:46.934
+!MESSAGE Indexed 'test_aes' (2 sources, 92 headers) in 62.1 sec: 5,888 declarations; 4,922 references; 0 unresolved inclusions; 0 syntax errors; 1 unresolved names (0.0092%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:53:07.315
+!MESSAGE Indexed 'test_des_ori' (1 sources, 77 headers) in 17.3 sec: 2,687 declarations; 3,082 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:53:35.683
+!MESSAGE Indexed 'test_file_aes' (1 sources, 81 headers) in 25.7 sec: 5,486 declarations; 4,729 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:54:01.286
+!MESSAGE Indexed 'test_des' (1 sources, 92 headers) in 24.6 sec: 5,886 declarations; 4,921 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:54:26.538
+!MESSAGE Indexed 'test_file_sha256' (1 sources, 25 headers) in 2.27 sec: 656 declarations; 1,260 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:54:37.758
+!MESSAGE Indexed 'main_keyexchanger_client' (2 sources, 1 headers) in 0.725 sec: 125 declarations; 474 references; 12 unresolved inclusions; 0 syntax errors; 35 unresolved names (5.5%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:54:46.306
+!MESSAGE Indexed 'test_socket_echo_client' (1 sources, 0 headers) in 0.241 sec: 12 declarations; 76 references; 7 unresolved inclusions; 0 syntax errors; 10 unresolved names (10%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:55:31.520
+!MESSAGE Indexed 'test_sha512' (1 sources, 31 headers) in 1.39 sec: 838 declarations; 1,580 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:55:32.638
+!MESSAGE Indexed 'test_md5' (1 sources, 0 headers) in 0.347 sec: 9 declarations; 23 references; 3 unresolved inclusions; 0 syntax errors; 3 unresolved names (8.6%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:55:34.302
+!MESSAGE Indexed 'main_canlogger_client_v1' (2 sources, 1 headers) in 0.571 sec: 125 declarations; 492 references; 12 unresolved inclusions; 0 syntax errors; 40 unresolved names (6.1%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:55:41.315
+!MESSAGE Indexed 'test_file_rsa' (1 sources, 0 headers) in 0.138 sec: 28 declarations; 122 references; 6 unresolved inclusions; 0 syntax errors; 12 unresolved names (7.4%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:13.190
+!MESSAGE Indexed 'main_canlogger_server_v2' (2 sources, 124 headers) in 31.8 sec: 11,420 declarations; 9,430 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:23.331
+!MESSAGE Indexed 'test_HMAC_sha256' (1 sources, 86 headers) in 9.99 sec: 5,649 declarations; 4,874 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:24.079
+!MESSAGE Indexed 'test_sha256' (1 sources, 0 headers) in 0.121 sec: 9 declarations; 25 references; 3 unresolved inclusions; 0 syntax errors; 3 unresolved names (8.1%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:48.057
+!MESSAGE Indexed 'main_canlogger_client_v2' (2 sources, 124 headers) in 23.9 sec: 11,398 declarations; 9,293 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:48.905
+!MESSAGE Indexed 'helloworld' (1 sources, 0 headers) in 0.152 sec: 3 declarations; 2 references; 3 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:55.368
+!MESSAGE Indexed 'test_socket_echo_server' (1 sources, 79 headers) in 6.23 sec: 2,201 declarations; 3,109 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:56.808
+!MESSAGE Indexed 'main_canlogger_server_v1' (2 sources, 1 headers) in 0.564 sec: 143 declarations; 610 references; 12 unresolved inclusions; 0 syntax errors; 59 unresolved names (7.3%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2019-07-19 17:56:58.573
+!MESSAGE Indexed 'main_keyexchanger_server' (2 sources, 1 headers) in 0.585 sec: 143 declarations; 603 references; 12 unresolved inclusions; 0 syntax errors; 58 unresolved names (7.2%)
