@@ -10,7 +10,6 @@
 
 int main(int argc, char *argv[]){
 
-	int i=0;
 	unsigned int server_port = atoi(argv[1]);
 	int socket_server;
 	int socket_client;
@@ -38,8 +37,6 @@ int main(int argc, char *argv[]){
 	char msg_file_size[4] = {0,};
 	unsigned char *buf = malloc(BUF_SIZE);
 
-	int file_block_count = 0;
-
 	unsigned char sessionkey[65] = {0,};
 
 	unsigned char hash_local[65] = {0,};
@@ -57,8 +54,8 @@ int main(int argc, char *argv[]){
 	int secret_len = 0;
 	int plain_len = 0;
 
-	unsigned char *secret;
-	unsigned char *plain;
+	unsigned char secret[BUF_SIZE];
+	unsigned char plain[BUF_SIZE];
 
 	printf("#######################\n");
 	printf("# CAN Logger - server #\n");
@@ -68,6 +65,18 @@ int main(int argc, char *argv[]){
 	if(argc < 2){
 		fprintf(stderr,"usage %s [PORT]\n", argv[0]);
 		return 1;
+	}
+	//// Key exist check
+	printf("+) RSA key checking..\n");
+	if(!((Exist_file(PRIKEY_NAME) && Exist_file(PUBKEY_NAME)))){
+		// file doesn't exist
+		printf("| RSA key not exists.!\n");
+		pemGen_pri(PRIKEY_NAME);
+		pemGen_pub(PRIKEY_NAME, PUBKEY_NAME);
+		printf("| RSA key generated!\n");
+	}else{
+		// file exist
+		printf("| RSA key already exists.!\n");
 	}
 
 	//// server start
@@ -125,32 +134,6 @@ int main(int argc, char *argv[]){
 		}
 		// loop main
 		while(flag_connect){
-			//// Key exist check
-			printf("+) RSA key checking..\n");
-			if(!((Exist_file(PRIKEY_NAME) && Exist_file(PUBKEY_NAME)))){
-				// file doesn't exist
-				printf("| RSA key not exists.!\n");
-				pemGen_pri(PRIKEY_NAME);
-				pemGen_pub(PRIKEY_NAME, PUBKEY_NAME);
-				printf("| RSA key generated!\n");
-			}else{
-				// file exist
-				printf("| RSA key already exists.!\n");
-			}
-
-			// init
-			/*
-			secret = NULL;
-			plain = NULL;
-
-			memset(buff_snd,0,sizeof(buff_snd));
-			memset(buff_rcv,0,sizeof(buff_rcv));
-			memset(sessionkey_encrypted,0,sizeof(sessionkey_encrypted));
-
-			memset(sessionkey,0,sizeof(sessionkey));
-			memset(hash_local,0,sizeof(hash_local));
-			memset(hash_recv,0,sizeof(hash_recv));
-			*/
 			//// Check pemkey
 			printf("+) Run Keycheck.\n");
 			// send <keycheck>
@@ -192,7 +175,7 @@ int main(int argc, char *argv[]){
 			//// Check pemkey MAC
 			printf("+) Check key MAC\n");
 			Gen_hash(PUBKEY_NAME,hash_local);
-			printf("| Publickey SHA256: [%s](%d)\n",hash_local,strlen(hash_local));
+			printf("| Publickey SHA256: [%s]\n",hash_local);
 
 			memset(buff_snd,0,sizeof(buff_snd));
 			strncpy(buff_snd, hash_local,sizeof(hash_local));
@@ -249,26 +232,16 @@ int main(int argc, char *argv[]){
 			secret_len = *((int*)msg_file_size);
 			printf("| secret len: %d\n",secret_len);
 
-			secret = malloc(secret_len);
-			file_block_count = (secret_len / BUF_SIZE)+1;
-			for(i=0;i<file_block_count;++i){
-				// receive secret data
-				memset(buff_rcv,0,sizeof(buff_rcv));
-				data_bytes=recv(socket_client,buff_rcv,BUF_SIZE,0);
-				printf("received!\n");
-				if(!(i == file_block_count))
-					memcpy(secret+(i*BUF_SIZE),buff_rcv,BUF_SIZE);
-				else
-					memcpy(secret+(i*BUF_SIZE),buff_rcv,(secret_len%BUF_SIZE));
-				printf("| received data[%d/%d]: %d\n",i+1,file_block_count,data_bytes);
-			}
+			// receive secret data
+			data_bytes=recv(socket_client,buff_rcv,BUF_SIZE,0);
+			printf("| received data: %d\n",data_bytes);
 
 			//// Decryption log file
 			// decryption
 			time_now = time(0);
 			local = localtime(&time_now);
 			sprintf(time_filename,"%02d%02d%02d-%02d%02d%02dout.log",local->tm_year%100,local->tm_mon,local->tm_mday, local->tm_hour, local->tm_min, local->tm_sec,timestring);
-			plain_len = aes_decrypt(sessionkey,secret,secret_len,&plain,time_filename);
+			plain_len = aes_decrypt(sessionkey,buff_rcv,secret_len,plain,time_filename);
 			printf("| File created [%s]\n",time_filename);
 
 			//// MAC verify
@@ -298,14 +271,11 @@ int main(int argc, char *argv[]){
 			//// Return to listening
 			printf("+) Client Socket close!\n");
 			close(socket_client);
-			free(secret);
-			free(plain);
-			printf("+) Memory allocation freed!\n");
 			flag_connect = 0;
 			flag_listen = 1;
 
 		}
-		printf("+) Process finished!\n");
+		printf("+) Data download finished!\n");
 	}
 	// program clean
 	close(socket_server);

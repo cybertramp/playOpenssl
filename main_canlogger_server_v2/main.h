@@ -5,10 +5,6 @@
  *      Author: greendot
  */
 
-// set up structure sorting
-#pragma pack(push, 1)
-#pragma pack(pop)
-
 #define BUF_SIZE 1024
 #define FILE_BUF_SIZE 4096
 #define PUBKEY_NAME "pub.key"
@@ -40,7 +36,8 @@ int pemGen_pri(unsigned char *filename);
 int pemGen_pub(unsigned char *filename_pri, unsigned char *filename_pub);
 int rsa_encrypt(unsigned char *key, unsigned char *plain, int plain_len, unsigned char *secret);
 int rsa_decrypt(unsigned char *key, unsigned char *secret, int secret_len, unsigned char *plain);
-int aes_decrypt(unsigned char *sessionkey, unsigned char *secret,int secret_len, unsigned char **plaindata,unsigned char *filename);
+int aes_encrypt(unsigned char *sessionkey, unsigned char *filename,unsigned char *secret);
+int aes_decrypt(unsigned char *sessionkey, unsigned char *secret,int secret_len, unsigned char *plaindata,unsigned char *filename);
 int Gen_hash(unsigned char *filename, unsigned char *hash_string);
 int Gen_aes256_sessionkey(unsigned char *sessionkey);
 int Exist_file(char *filename);

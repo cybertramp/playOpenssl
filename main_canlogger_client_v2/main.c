@@ -10,7 +10,6 @@
 
 int main(int argc, char *argv[]){
 
-	int i=0;
 	unsigned char hash_local[65] = {0,};
 	unsigned char hash_recv[65] = {0,};
 
@@ -39,9 +38,6 @@ int main(int argc, char *argv[]){
 	const int bufSize = BUF_SIZE;
 	unsigned char *buf = malloc(bufSize);
 
-
-	int file_block_count = 0;
-
 	unsigned char sessionkey[65] = {0,};
 
 	unsigned char sessionkey_encrypted[1024];
@@ -53,16 +49,16 @@ int main(int argc, char *argv[]){
 
 	int secret_len = 0;
 	int plain_len = 0;
-	//unsigned char secret[1024];
-	unsigned char *secret;
+	unsigned char secret[1024];
+	unsigned char plain[1024];
 
 	printf("#######################\n");
 	printf("# CAN Logger - client #\n");
 	printf("#######################\n");
 
 	//// Parameter check
-	if(argc < 4){
-		fprintf(stderr,"usage %s [IP] [PORT] [logfile]\n", argv[0]);
+	if(argc < 3){
+		fprintf(stderr,"usage %s [IP] [PORT]\n", argv[0]);
 		return 1;
 	}
 	//// Client start
@@ -145,8 +141,8 @@ int main(int argc, char *argv[]){
 			strncpy(hash_recv, buff_rcv,sizeof(hash_recv));
 			Gen_hash(PUBKEY_NAME,hash_local);
 			printf("| keyfile verifying\n");
-			printf("| client key hash: [%s](%d)\n",hash_local,strlen(hash_local));
-			printf("| server key hash: [%s](%d)\n",hash_recv,strlen(hash_recv));
+			printf("| client key hash: [%s]\n",hash_local);
+			printf("| server key hash: [%s]\n",hash_recv);
 			if(!(strcmp(hash_local,hash_recv) == 0)){
 				memset(buff_snd,0,sizeof(buff_snd));
 				strncpy(buff_snd, "/keymac-fail",BUF_SIZE);
@@ -199,7 +195,7 @@ int main(int argc, char *argv[]){
 			//// Encryption log file
 			printf("+) Encrypting log file!\n");
 			// log file encryption
-			secret_len = aes_encrypt(sessionkey,argv[3],&secret);
+			secret_len = aes_encrypt(sessionkey,"can.log",secret);
 
 			//// Upload encrypted log file
 			// receive <uploadlogfile>
@@ -212,21 +208,12 @@ int main(int argc, char *argv[]){
 				send(socket_client, msg_file_size, sizeof(msg_file_size),0);
 				printf("| secret len: %d\n",secret_len);
 
-				file_block_count = (secret_len / BUF_SIZE)+1;
-				printf("blockcount: %d\n",file_block_count);
-
-				for(i=0;i<file_block_count;++i){
-					// Transmission file data
-					memset(buff_snd,0,sizeof(buff_snd));
-					printf("send!\n");
-					printf("%p\n",secret);
-					printf("===========================\n");
-					data_bytes=send(socket_client, secret+(i*BUF_SIZE), BUF_SIZE,0);
-					printf("| sended data: %d\n",data_bytes);
-				}
+				// Transmission file data
+				data_bytes=send(socket_client, secret, BUF_SIZE,0);
+				printf("| sended data: %d\n",data_bytes);
 
 				//// Transmission log file MAC
-				Gen_hash(argv[3],hash_local);
+				Gen_hash("can.log",hash_local);
 				memset(buff_snd,0,sizeof(buff_snd));
 				strncpy(buff_snd, hash_local,sizeof(hash_local));
 				data_bytes=send(socket_client,buff_snd, BUF_SIZE,0);
@@ -245,10 +232,8 @@ int main(int argc, char *argv[]){
 			printf("+) Client Socket close!\n");
 			//// Exit Program
 			close(socket_client);
-			free(secret);
 			flag_connect = 0;
 			flag_client = 0;
-
 		}
 		printf("+) Data upload finished!\n");
 	}
