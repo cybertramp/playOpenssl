@@ -10,6 +10,16 @@
 
 int main(int argc, char *argv[]){
 
+	printf("\n#######################\n");
+	printf("# CAN Logger - client #\n");
+	printf("#######################\n\n");
+
+	//// Parameter check
+	if(argc < 4){
+		fprintf(stderr,"usage %s [IP] [PORT] [filename]\n", argv[0]);
+		return 1;
+	}
+
 	int i=0;
 
 	unsigned char hash_local[65] = {0,};
@@ -56,15 +66,7 @@ int main(int argc, char *argv[]){
 
 	int file_block_count = 0;
 
-	printf("#######################\n");
-	printf("# CAN Logger - client #\n");
-	printf("#######################\n");
 
-	//// Parameter check
-	if(argc < 3){
-		fprintf(stderr,"usage %s [IP] [PORT]\n", argv[0]);
-		return 1;
-	}
 	//// Client start
 	// socket()
 	if(-1 == (socket_client = socket(PF_INET, SOCK_STREAM,0))){
@@ -200,7 +202,7 @@ int main(int argc, char *argv[]){
 			printf("+) Encrypting log file!\n");
 
 			// log file encryption
-			secret_len = aes_encrypt(sessionkey,"can.log",&secret);
+			secret_len = aes_encrypt(sessionkey,argv[3],&secret);
 
 			//// Upload encrypted log file
 			// receive <uploadlogfile>
@@ -214,19 +216,18 @@ int main(int argc, char *argv[]){
 				printf("| secret len: %d\n",secret_len);
 
 				file_block_count = (secret_len / BUF_SIZE)+1;
-				printf("blockcount: %d\n",file_block_count);
+				//printf("blockcount: %d\n",file_block_count);
 
-				printf("====\n%s\n====\n",secret);
+				//printf("====\n%s\n====\n",secret);
 
 				for(i=0;i<file_block_count;++i){
 					// Transmission file data
-					printf("%p\n",secret);
-					data_bytes=send(socket_client, secret+(i*BUF_SIZE), BUF_SIZE,0);
-					printf("| sended data: %d\n",data_bytes);
+					data_bytes+=send(socket_client, secret+(i*BUF_SIZE), BUF_SIZE,0);
+					printf("| sended data [%d/%d] %dbytes\n",i+1,file_block_count,data_bytes);
 				}
 
 				//// Transmission log file MAC
-				Gen_hash("can.log",hash_local);
+				Gen_hash(argv[3],hash_local);
 				memset(buff_snd,0,sizeof(buff_snd));
 				strncpy(buff_snd, hash_local,sizeof(hash_local));
 				data_bytes=send(socket_client,buff_snd, BUF_SIZE,0);
@@ -235,9 +236,9 @@ int main(int argc, char *argv[]){
 				// receive <uploadlogfile>
 				memset(buff_rcv,0,sizeof(buff_rcv));
 				data_bytes = recv(socket_client, buff_rcv, BUF_SIZE,0);
-				if(strcmp(buff_rcv,"/file-mac-failed") == 0){
+				if(strcmp(buff_rcv,"/filemac-fail") == 0){
 					printf("| MAC Verify failed.\n");
-				}else if(strcmp(buff_rcv,"/file-mac-success") == 0){
+				}else if(strcmp(buff_rcv,"/filemac-success") == 0){
 					printf("| MAC Verify success.\n");
 				}
 

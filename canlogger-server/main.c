@@ -10,6 +10,16 @@
 
 int main(int argc, char *argv[]){
 
+	printf("\n#######################\n");
+	printf("# CAN Logger - server #\n");
+	printf("#######################\n\n");
+
+	//// Parameter check
+	if(argc < 2){
+		fprintf(stderr,"usage %s [PORT]\n", argv[0]);
+		return 1;
+	}
+
 	int i=0;
 	unsigned int server_port = atoi(argv[1]);
 	int socket_server;
@@ -59,15 +69,8 @@ int main(int argc, char *argv[]){
 
 
 
-	printf("#######################\n");
-	printf("# CAN Logger - server #\n");
-	printf("#######################\n");
 
-	//// Parameter check
-	if(argc < 2){
-		fprintf(stderr,"usage %s [PORT]\n", argv[0]);
-		return 1;
-	}
+
 
 	//// server start
 	// socket()
@@ -200,6 +203,7 @@ int main(int argc, char *argv[]){
 			data_bytes=recv(socket_client, buff_rcv, BUF_SIZE,0);
 			if(strcmp(buff_rcv,"/keymac-fail") == 0){
 				printf("| keycheck fail detection!\n");
+				close(socket_client);
 				break;
 			}else if(strcmp(buff_rcv,"/keymac-success") == 0){
 				printf("| keycheck success!\n");
@@ -233,6 +237,10 @@ int main(int argc, char *argv[]){
 				data_bytes=recv(socket_client, buff_rcv, BUF_SIZE,0);
 				if(strcmp(buff_rcv,"/sessionkey-success") == 0){
 					printf("| Client received session key!\n");
+				}else{
+					printf("| Client can't received session key!\n");
+					close(socket_client);
+					break;
 				}
 			}
 			memset(buff_rcv,0,sizeof(buff_rcv));
@@ -248,20 +256,23 @@ int main(int argc, char *argv[]){
 			secret_len = *((int*)msg_file_size);
 			printf("| secret len: %d\n",secret_len);
 
+			data_bytes=0;
 			secret = (unsigned char *)malloc(secret_len);
 			file_block_count = (secret_len / BUF_SIZE)+1;
 			for(i=0;i<file_block_count;++i){
 				// receive secret data
 				memset(buff_rcv,0,sizeof(buff_rcv));
-				data_bytes=recv(socket_client,buff_rcv,BUF_SIZE,0);
-				printf("received!\n");
-				if(!(i == file_block_count))
+				data_bytes+=recv(socket_client,buff_rcv,BUF_SIZE,0);
+				if(!(i+1 == file_block_count)){
 					memcpy(secret+(i*BUF_SIZE),buff_rcv,BUF_SIZE);
-				else
+
+				}
+				else{
 					memcpy(secret+(i*BUF_SIZE),buff_rcv,(secret_len%BUF_SIZE));
-				printf("| received data[%d/%d]: %d\n",i+1,file_block_count,data_bytes);
+				}
+				printf("| received data[%d/%d]: %dbytes\n",i+1,file_block_count,data_bytes);
 			}
-			printf("====\n%s\n====\n",secret);
+			//printf("====\n%s\n====(%d)\n",secret,secret_len);
 			//// Decryption log file
 			// decryption
 			time_now = time(0);
@@ -284,14 +295,14 @@ int main(int argc, char *argv[]){
 
 				// send <file-mac-failed>
 				memset(buff_snd,0,sizeof(buff_snd));
-				strncpy(buff_snd, "/file-mac-failed",BUF_SIZE);
+				strncpy(buff_snd, "/filemac-fail",BUF_SIZE);
 				data_bytes=send(socket_client,buff_snd, strlen(buff_snd)+1,0);
-				remove("out.log");
+				remove(time_filename);
 				printf("| Verification failed!\n");
 			}else{
 				// send <file-mac-success>
 				memset(buff_snd,0,sizeof(buff_snd));
-				strncpy(buff_snd, "/file-mac-success",BUF_SIZE);
+				strncpy(buff_snd, "/filemac-success",BUF_SIZE);
 				data_bytes=send(socket_client,buff_snd, strlen(buff_snd)+1,0);
 				printf("| Verification success!\n");
 				downlod_count++;

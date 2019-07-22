@@ -2,7 +2,8 @@
  * subfunc.c
  *
  *  Created on: Jul 16, 2019
- *      Author: greendot
+ *  Author: greendot
+ *  paran_son@outlook.com
  */
 
 #include "main.h"
@@ -57,7 +58,6 @@ int pemGen_pub(unsigned char *filename_pri, unsigned char *filename_pub){
 
 	}else{
 		printf("| Write successful!\n| File name: %s\n",filename_pub);
-		rsa = NULL;
 		RSA_free(rsa);
 		fclose(fp_pri);
 		fclose(fp_pub);
@@ -75,20 +75,20 @@ int rsa_encrypt(char *key, unsigned char *plain, int plain_len, unsigned char *s
 	// File load
 	fp = fopen(key, "r");
 	if(!fp){
-		printf("file error!\n");
+		printf("+) [error] File error!\n");
 		return 1;
 	}
-	printf("##\n");
 	// Read from fp to rsa_pkey
 	RSA *rsa_pkey= RSA_new();
-	printf("##\n");
+	rsa_pkey = NULL;
+	//RSA *rsa_pkey;
 	rsa_pkey = PEM_read_RSAPrivateKey(fp, &rsa_pkey, NULL, NULL);
 
 	// Load pem key from file
 	res_len = RSA_private_encrypt(plain_len,plain,secret,rsa_pkey,RSA_PKCS1_PADDING);
 
 	// clean
-	RSA_free(rsa_pkey);
+	//RSA_free(rsa_pkey);
 	fclose(fp);
 	return res_len;
 }
@@ -100,12 +100,13 @@ int rsa_decrypt(char *key, unsigned char *secret, int secret_len, unsigned char 
 	// File load
 	fp = fopen(key, "r");
 	if(!fp){
-		printf("file error!\n");
+		printf("+) [error] File error!\n");
 		return 1;
 	}
 
 	// Read from fp to rsa_pkey
 	RSA *rsa_pkey= RSA_new();
+	rsa_pkey = NULL;
 	rsa_pkey = PEM_read_RSAPublicKey(fp, &rsa_pkey, NULL, NULL);
 	// Load pem key from file
 	res_len = RSA_public_decrypt(secret_len,secret,plain,rsa_pkey,RSA_PKCS1_PADDING);
@@ -123,7 +124,8 @@ int aes_decrypt(unsigned char *sessionkey,unsigned char *filename, unsigned char
 	int i=0;
 	unsigned char key[16];
 	unsigned char iv[16];
-	unsigned char buffer[secret_len];
+
+	unsigned char *buffer;
 	int bytesRead = 0;
 
 	//// Parsing from sessionkey
@@ -141,32 +143,27 @@ int aes_decrypt(unsigned char *sessionkey,unsigned char *filename, unsigned char
 		printf("+) [error] %s not exists!\n",filename);
 		return -1;
 	}
-	printf("ok!\n");
 	//// decryption from secret
-
+	buffer = malloc(secret_len);
 	EVP_CIPHER_CTX *ctx;
-	printf("ok!\n");
     int len1 = 0;
     int len2 = 0;
     int plaindata_len=0;
 
-    EVP_CIPHER_CTX_init(ctx);
-    printf("ok!\n");
-    EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv);
-
+    ctx = EVP_CIPHER_CTX_new();
+    EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL,key,iv);
     EVP_DecryptUpdate(ctx, buffer, &len1, secret, secret_len);
     EVP_DecryptFinal_ex(ctx, buffer + len1, &len2);
 
-    EVP_CIPHER_CTX_cleanup(ctx);
+    EVP_CIPHER_CTX_free(ctx);
 
     //plaindata[secret_len] = '\0';
     plaindata_len = len1+len2;
-    printf("plain_len: %d\n",plaindata_len);
-    printf("buffer: %s\n",buffer);
     //// data File write
 
 	bytesRead = fwrite(buffer, 1, plaindata_len, fp);
 	//// clean
+	free(buffer);
 	fclose(fp);
     return plaindata_len;
 }
@@ -182,7 +179,6 @@ int Gen_hash(unsigned char *filename, unsigned char *hash_string){
 	FILE *fp = fopen(filename, "r");
 	if(!fp) return 1;
 
-	printf("bufsize: %d\n", bufsize);
 	buf = malloc(bufsize);
 	if(!buf) return 1;
 
@@ -192,7 +188,7 @@ int Gen_hash(unsigned char *filename, unsigned char *hash_string){
 
 	while((bytesRead = fread(buf, 1, bufsize, fp)))
 	{
-		printf("bytesRead: %d\n",bytesRead);
+		//printf("bytesRead: %d\n",bytesRead);
 		SHA256_Update(&ctx, buf, bytesRead);
 	}
 

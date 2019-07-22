@@ -2,7 +2,8 @@
  * subfunc.c
  *
  *  Created on: Jul 16, 2019
- *      Author: greendot
+ *  Author: greendot
+ *  paran_son@outlook.com
  */
 
 #include "main.h"
@@ -27,6 +28,7 @@ int rsa_encrypt(unsigned char *key, unsigned char *plain, int plain_len, unsigne
 	res_len = RSA_private_encrypt(plain_len,plain,secret,rsa_pkey,RSA_PKCS1_PADDING);
 
 	//// clean
+	RSA_free(rsa_pkey);
 	fclose(fp);
 	return res_len;
 }
@@ -48,6 +50,7 @@ int rsa_decrypt(unsigned char *key, unsigned char *secret, int secret_len, unsig
 	res_len = RSA_public_decrypt(secret_len,secret,plain,rsa_pkey,RSA_PKCS1_PADDING);
 
 	//// clean
+	RSA_free(rsa_pkey);
 	fclose(fp);
 	return res_len;
 
@@ -101,7 +104,6 @@ int aes_encrypt(unsigned char *sessionkey, unsigned char *filename,unsigned char
 	}
 
 	fread(buf,1,filesize, fp);//Read Entire File
-
 	//// encryption precess
 	EVP_CIPHER_CTX *ctx;
 	int len1 = 0;
@@ -113,9 +115,6 @@ int aes_encrypt(unsigned char *sessionkey, unsigned char *filename,unsigned char
 	EVP_EncryptUpdate(ctx, *secret, &len1, buf, filesize);
 	EVP_EncryptFinal_ex(ctx, *secret + len1, &len2);
 	EVP_CIPHER_CTX_free(ctx);
-
-	printf("%p\n",secret);
-	printf("%d\n", len1+len2);
 
 	//// clean
 	free(buf);
@@ -134,7 +133,6 @@ int Gen_hash(unsigned char *filename, unsigned char *hash_string){
 	FILE *fp = fopen(filename, "r");
 	if(!fp) return 1;
 
-	printf("bufsize: %d\n", bufsize);
 	buf = malloc(bufsize);
 	if(!buf) return 1;
 
@@ -144,7 +142,6 @@ int Gen_hash(unsigned char *filename, unsigned char *hash_string){
 
 	while((bytesRead = fread(buf, 1, bufsize, fp)))
 	{
-		printf("bytesRead: %d\n",bytesRead);
 		SHA256_Update(&ctx, buf, bytesRead);
 	}
 
@@ -154,9 +151,9 @@ int Gen_hash(unsigned char *filename, unsigned char *hash_string){
 	for(i=0;i<SHA256_DIGEST_LENGTH;++i)
 		sprintf(hash_string+(i*2), "%02x",digest[i]);
 
-
-	fclose(fp);
 	free(buf);
+	fclose(fp);
+
 }
 
 /* file exist check */

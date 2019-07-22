@@ -6,7 +6,6 @@
  */
 
 #define BUF_SIZE 1024
-#define FILE_BUF_SIZE 4096
 #define PUBKEY_NAME "pub.key"
 #define PRIKEY_NAME "pri.key"
 
